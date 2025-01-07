@@ -55,7 +55,7 @@ const Footer = () => {
 
         {/* Bottom Text */}
         <div className="text-center mt-8">
-          <p className="text-gray-400 text-sm">&copy; 2024 Pokaribs Native Kitchen & Lounge. All Rights Reserved.</p>
+         <Link to="/admon"><p className="text-gray-400 text-sm">&copy; 2024 Pokaribs Native Kitchen & Lounge. All Rights Reserved.</p></Link>
         </div>
       </div>
     </footer>
