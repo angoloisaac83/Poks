@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getFirestore, updateDoc, doc } from 'firebase/firestore';
+import { collection, getFirestore, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -14,7 +13,7 @@ const firebaseConfig = {
   measurementId: "G-9X4EKVEYPX"
 };
 
-// Initialize Firebase
+// Initialize Firebase only if it hasn't been initialized already
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
@@ -23,19 +22,15 @@ const Admin = () => {
   const [category, setCategory] = useState('cocktails');
   const [newDrink, setNewDrink] = useState({ name: '', ingredients: '', price: '', image: '' });
   const [selectedDrinkIndex, setSelectedDrinkIndex] = useState(null);
-  const navigate = useNavigate(); // Initialize navigate for redirection
 
-  // Prompt for username and password on component mount
-  useEffect(() => {
     const username = prompt("Enter Username:");
     const password = prompt("Enter Password:");
 
     if (username !== 'pokaribs' || password !== 'pokaribs123') {
       alert('Invalid credentials! Redirecting...');
-      navigate('/login'); // Redirect to login page if credentials are incorrect
+      history.push('/login');
     }
-  }, [navigate]);
-
+  
   // Fetch categories and drinks
   useEffect(() => {
     const fetchCategories = async () => {
@@ -52,7 +47,9 @@ const Admin = () => {
     fetchCategories();
   }, []);
 
-  const handleCategoryChange = (e) => setCategory(e.target.value);
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+  };
 
   const handleAddDrink = async () => {
     if (!newDrink.name || !newDrink.ingredients || !newDrink.price || !newDrink.image) {
@@ -64,8 +61,10 @@ const Admin = () => {
       const categoryDocRef = doc(db, 'drinks', category);
       const updatedItems = [...categories.find(cat => cat.id === category).items, newDrink];
 
+      // Update the category document with the new drink
       await updateDoc(categoryDocRef, { items: updatedItems });
 
+      // Update local state
       setCategories(prevCategories =>
         prevCategories.map(cat =>
           cat.id === category ? { ...cat, items: updatedItems } : cat
@@ -75,31 +74,30 @@ const Admin = () => {
       setNewDrink({ name: '', ingredients: '', price: '', image: '' });
     } catch (error) {
       console.error('Error adding drink:', error);
-      alert('Error adding drink. Please try again.');
     }
   };
 
   const handleUpdateDrink = async () => {
-    if (selectedDrinkIndex === null) return;
+    if (selectedDrinkIndex !== null) {
+      try {
+        const categoryDocRef = doc(db, 'drinks', category);
+        const items = categories.find(cat => cat.id === category).items;
+        items[selectedDrinkIndex] = newDrink; // Update drink
 
-    try {
-      const categoryDocRef = doc(db, 'drinks', category);
-      const items = categories.find(cat => cat.id === category).items;
-      items[selectedDrinkIndex] = newDrink; 
+        await updateDoc(categoryDocRef, { items });
 
-      await updateDoc(categoryDocRef, { items });
+        // Update local state
+        setCategories(prevCategories =>
+          prevCategories.map(cat =>
+            cat.id === category ? { ...cat, items } : cat
+          )
+        );
 
-      setCategories(prevCategories =>
-        prevCategories.map(cat =>
-          cat.id === category ? { ...cat, items } : cat
-        )
-      );
-
-      setNewDrink({ name: '', ingredients: '', price: '', image: '' });
-      setSelectedDrinkIndex(null);
-    } catch (error) {
-      console.error('Error updating drink:', error);
-      alert('Error updating drink. Please try again.');
+        setNewDrink({ name: '', ingredients: '', price: '', image: '' });
+        setSelectedDrinkIndex(null);
+      } catch (error) {
+        console.error('Error updating drink:', error);
+      }
     }
   };
 
@@ -110,6 +108,7 @@ const Admin = () => {
 
       await updateDoc(categoryDocRef, { items });
 
+      // Update local state
       setCategories(prevCategories =>
         prevCategories.map(cat =>
           cat.id === category ? { ...cat, items } : cat
@@ -117,13 +116,11 @@ const Admin = () => {
       );
     } catch (error) {
       console.error('Error deleting drink:', error);
-      alert('Error deleting drink. Please try again.');
     }
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <head><title>Admin - Dashboard</title></head>
+    <div className="container mx-auto p-6"><head><title>Admin - Dashboard</title></head>
       <h1 className="text-3xl font-bold text-center mb-6">Drink Menu</h1>
       <div className="mb-4 text-center">
         <label htmlFor="category" className="text-lg font-semibold">Select Category:</label>
@@ -153,7 +150,7 @@ const Admin = () => {
                 <button
                   onClick={() => {
                     setSelectedDrinkIndex(index);
-                    setNewDrink(drink);
+                    setNewDrink(drink); // Load drink data for editing
                   }}
                   className="mr-2 text-blue-500 hover:text-blue-700"
                 >
