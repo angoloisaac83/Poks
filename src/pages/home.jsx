@@ -56,7 +56,7 @@ const Home = () => {
             </header>
 
             {/* Menu Section */}
-            <div className="container mx-auto w-full h-fit p-2">
+            <div className="container w-full h-fit p-2">
                 <h2 className="text-3xl font-bold text-center mb-8">Our Menu</h2>
                 <div className="flex pl-[150px] w-full overflow-x-scroll justify-center mb-4">
                     {categories.map((category) => (
