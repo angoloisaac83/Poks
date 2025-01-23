@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getFirestore, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
+import { useHistory } from 'react-router-dom'; // Import useHistory for redirection
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -22,6 +23,18 @@ const Admin = () => {
   const [category, setCategory] = useState('cocktails');
   const [newDrink, setNewDrink] = useState({ name: '', ingredients: '', price: '', image: '' });
   const [selectedDrinkIndex, setSelectedDrinkIndex] = useState(null);
+  const history = useHistory(); // Initialize history for redirection
+
+  // Prompt for username and password on component mount
+  useEffect(() => {
+    const username = prompt("Enter Username:");
+    const password = prompt("Enter Password:");
+
+    if (username !== 'pokaribs' || password !== 'pokaribs123') {
+      alert('Invalid credentials! Redirecting...');
+      history.push('/login'); // Redirect to login page if credentials are incorrect
+    }
+  }, [history]);
 
   // Fetch categories and drinks
   useEffect(() => {
@@ -112,7 +125,8 @@ const Admin = () => {
   };
 
   return (
-    <div className="container mx-auto p-6"><head><title>Admin - Dashboard</title></head>
+    <div className="container mx-auto p-6">
+      <head><title>Admin - Dashboard</title></head>
       <h1 className="text-3xl font-bold text-center mb-6">Drink Menu</h1>
       <div className="mb-4 text-center">
         <label htmlFor="category" className="text-lg font-semibold">Select Category:</label>
@@ -252,4 +266,4 @@ const Admin = () => {
   );
 };
 
-export default Admin; 
+export default Admin;
