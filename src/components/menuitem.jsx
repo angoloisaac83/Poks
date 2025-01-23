@@ -13,7 +13,7 @@ const MenuItem = ({ id, name, price, image, description }) => {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-xl p-4 text-center max-w-xs mx-auto">
+        <div className="bg-white rounded-lg shadow-xl p-4 text-center max-w-[270px] mx-auto">
             {/* Drink Image */}
             <img className="rounded-md w-full h-[200px] object-cover" src={image} alt={name} />
             
