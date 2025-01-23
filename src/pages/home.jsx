@@ -36,7 +36,7 @@ const Home = () => {
                     muted
                     className='absolute top-0 left-0 w-full h-screen min-h-full object-cover z-[-1]'
                 >
-                    <source src={"../../public/IMG_9271.MP4"} type="video/mp4" />
+                    <source src={"https://raw.githubusercontent.com/angoloisaac83/Poks/main/public/public/IMG_9271.MP4"} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
 
