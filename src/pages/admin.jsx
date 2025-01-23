@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getFirestore, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
+import { useNavigate } from 'react-router-dom';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -22,14 +23,18 @@ const Admin = () => {
   const [category, setCategory] = useState('cocktails');
   const [newDrink, setNewDrink] = useState({ name: '', ingredients: '', price: '', image: '' });
   const [selectedDrinkIndex, setSelectedDrinkIndex] = useState(null);
+  const navigate = useNavigate(); // Initialize navigate for redirection
 
+  // Prompt for username and password on component mount
+  useEffect(() => {
     const username = prompt("Enter Username:");
     const password = prompt("Enter Password:");
 
     if (username !== 'pokaribs' || password !== 'pokaribs123') {
       alert('Invalid credentials! Redirecting...');
-      history.push('/login');
+      navigate('/login'); // Redirect to login page if credentials are incorrect
     }
+  }, [navigate]);
   
   // Fetch categories and drinks
   useEffect(() => {
